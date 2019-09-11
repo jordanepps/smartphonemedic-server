@@ -14,15 +14,11 @@ app.use(cors());
 app.use(helmet());
 
 app.get('/', (req, res) => {
-	res.send('Hello, boilerplate!');
+  res.send('Hello, boilerplate!');
 });
 
 app.use(function errorHandler(error, req, res, next) {
-	let response =
-		NODE_ENV === 'production'
-			? { error: { message: 'server error' } }
-			: { message: error.message, error };
-	res.status(500).json(response);
+  res.status(500).json({ message: error.message, error });
 });
 
 module.exports = app;
