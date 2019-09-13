@@ -19,6 +19,13 @@ usersRouter.post('/', jsonBodyParser, (req, res, next) => {
 
   if (passwordError) return res.status(400).json({ error: passwordError });
 
+  UsersService.userAllowed(req.app.get('db'), email).then(userAllowed => {
+    if (!userAllowed)
+      return res
+        .status(400)
+        .json({ error: `Email provided is not allowed to register` });
+  });
+
   UsersService.hasUserWithEmail(req.app.get('db'), email)
     .then(hasUserWithEmail => {
       if (hasUserWithEmail)

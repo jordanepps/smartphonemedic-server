@@ -26,10 +26,35 @@ function makeUsersArray() {
   ];
 }
 
+function makeAllowedUsersArray() {
+  return [
+    {
+      id: 1,
+      email: 'one@email.com'
+    },
+    {
+      id: 2,
+      email: 'two@email.com'
+    },
+    {
+      id: 3,
+      email: 'three@email.com'
+    },
+    {
+      id: 4,
+      email: 'four@email.com'
+    },
+    {
+      id: 5,
+      email: 'allowed@email.com'
+    }
+  ];
+}
+
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
-      users
+      users, allowed
       RESTART IDENTITY CASCADE`
   );
 }
@@ -48,6 +73,21 @@ function seedUsers(db, users) {
     );
 }
 
+function seedAllowed(db, allowed) {
+  const preppedUsers = allowed.map(user => ({
+    ...user
+  }));
+  return db
+    .into('allowed')
+    .insert(preppedUsers)
+    .then(() =>
+      // update the auto sequence to stay in sync
+      db.raw(`SELECT setval('allowed_id_seq', ?)`, [
+        allowed[allowed.length - 1].id
+      ])
+    );
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.email,
@@ -58,7 +98,9 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 
 module.exports = {
   makeUsersArray,
+  makeAllowedUsersArray,
   cleanTables,
   seedUsers,
-  makeAuthHeader
+  makeAuthHeader,
+  seedAllowed
 };

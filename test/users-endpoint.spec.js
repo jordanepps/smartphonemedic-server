@@ -1,13 +1,14 @@
 const knex = require('knex');
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Users Endpoint', () => {
+describe('Users Endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
-  const testUser = testUsers[0];
+  const allowedUsers = helpers.makeAllowedUsersArray();
+  //   const testUser = testUsers[0];
 
   before('make knex instance', () => {
     db = knex({
@@ -26,6 +27,7 @@ describe.only('Users Endpoint', () => {
   describe('POST /api/users', () => {
     context('User validation', () => {
       beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+      beforeEach('insert allowed', () => helpers.seedAllowed(db, allowedUsers));
 
       const requiredFields = ['email', 'password'];
 
@@ -107,6 +109,18 @@ describe.only('Users Endpoint', () => {
           .expect(400, {
             error: `Password must contain 1 upper case, lower case, number and special character`
           });
+      });
+
+      it(`responds 400 error when user email isn't allowed to register`, () => {
+        const notAllowedUser = {
+          email: 'notAllowed@email.com',
+          //   email: 'allowed@email.com',
+          password: '1Aa!2Bb@'
+        };
+        return supertest(app)
+          .post('/api/users')
+          .send(notAllowedUser)
+          .expect(400, { error: `Email provided is not allowed to register` });
       });
     });
   });
