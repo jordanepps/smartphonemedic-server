@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 
 const authRouter = require('./auth/auth-router');
+const userRouter = require('./users/users-router');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(helmet());
 
 app.use('/api/auth', authRouter);
+app.use('/api/users', userRouter);
 
 app.get('/api', (req, res) => {
   res.send('SPM API');
