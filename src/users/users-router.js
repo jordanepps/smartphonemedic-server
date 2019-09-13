@@ -19,33 +19,35 @@ usersRouter.post('/', jsonBodyParser, (req, res, next) => {
 
   if (passwordError) return res.status(400).json({ error: passwordError });
 
-  UsersService.userAllowed(req.app.get('db'), email).then(userAllowed => {
-    if (!userAllowed)
-      return res
-        .status(400)
-        .json({ error: `Email provided is not allowed to register` });
-  });
+  UsersService.userAllowed(req.app.get('db'), email)
+    .then(userAllowed => {
+      if (!userAllowed)
+        return res
+          .status(400)
+          .json({ error: `Email provided is not allowed to register` });
 
-  UsersService.hasUserWithEmail(req.app.get('db'), email)
-    .then(hasUserWithEmail => {
-      if (hasUserWithEmail)
-        return res.status(400).json({ error: 'Email already registered' });
+      UsersService.hasUserWithEmail(req.app.get('db'), email)
+        .then(hasUserWithEmail => {
+          if (hasUserWithEmail)
+            return res.status(400).json({ error: 'Email already registered' });
 
-      return UsersService.hashPassword(password).then(hashedPassword => {
-        const newUser = {
-          email,
-          password: hashedPassword
-        };
+          return UsersService.hashPassword(password).then(hashedPassword => {
+            const newUser = {
+              email,
+              password: hashedPassword
+            };
 
-        return UsersService.insertUser(req.app.get('db'), newUser).then(
-          user => {
-            res
-              .status(201)
-              .location(path.posix.join(req.originalUrl, `/${user.id}`))
-              .json(UsersService.serializeUser(user));
-          }
-        );
-      });
+            return UsersService.insertUser(req.app.get('db'), newUser).then(
+              user => {
+                res
+                  .status(201)
+                  .location(path.posix.join(req.originalUrl, `/${user.id}`))
+                  .json(UsersService.serializeUser(user));
+              }
+            );
+          });
+        })
+        .catch(next);
     })
     .catch(next);
 });

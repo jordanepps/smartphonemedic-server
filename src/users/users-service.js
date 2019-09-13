@@ -14,9 +14,7 @@ const UsersService = {
     return db('allowed')
       .where({ email })
       .first()
-      .then(user => {
-        return !!user;
-      });
+      .then(user => !!user);
   },
   insertUser(db, newUser) {
     return db

@@ -114,7 +114,6 @@ describe('Users Endpoint', () => {
       it(`responds 400 error when user email isn't allowed to register`, () => {
         const notAllowedUser = {
           email: 'notAllowed@email.com',
-          //   email: 'allowed@email.com',
           password: '1Aa!2Bb@'
         };
         return supertest(app)
