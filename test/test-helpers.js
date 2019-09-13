@@ -6,22 +6,22 @@ function makeUsersArray() {
     {
       id: 1,
       email: 'one@email.com',
-      password: 'password'
+      password: 'Password1!'
     },
     {
       id: 2,
       email: 'two@email.com',
-      password: 'password'
+      password: 'Password1!'
     },
     {
       id: 3,
       email: 'three@email.com',
-      password: 'password'
+      password: 'Password1!'
     },
     {
       id: 4,
       email: 'four@email.com',
-      password: 'password'
+      password: 'Password1!'
     }
   ];
 }

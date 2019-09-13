@@ -46,6 +46,68 @@ describe.only('Users Endpoint', () => {
             });
         });
       });
+
+      it(`responds 400 'Password be longer than 8 characters' when empty password`, () => {
+        const userShortPassword = {
+          email: 'test@email.com',
+          password: '1234567'
+        };
+        return supertest(app)
+          .post('/api/users')
+          .send(userShortPassword)
+          .expect(400, { error: `Password be longer than 8 characters` });
+      });
+
+      it(`responds 400 'Password be less than 72 characters' when long password`, () => {
+        const userLongPassword = {
+          email: 'test@email.com',
+          password: '*'.repeat(73)
+        };
+
+        return supertest(app)
+          .post('/api/users')
+          .send(userLongPassword)
+          .expect(400, { error: `Password be less than 72 characters` });
+      });
+
+      it(`responds 400 error when password starts with spaces`, () => {
+        const userPasswordStartsSpaces = {
+          email: 'test@email.com',
+          password: ' 1Aa!2Bb@'
+        };
+        return supertest(app)
+          .post('/api/users')
+          .send(userPasswordStartsSpaces)
+          .expect(400, {
+            error: `Password must not start or end with empty spaces`
+          });
+      });
+
+      it(`responds 400 error when password ends with spaces`, () => {
+        const userPasswordEndsSpaces = {
+          email: 'test@email.com',
+          password: '1Aa!2Bb@ '
+        };
+        return supertest(app)
+          .post('/api/users')
+          .send(userPasswordEndsSpaces)
+          .expect(400, {
+            error: `Password must not start or end with empty spaces`
+          });
+      });
+
+      it(`responds 400 error when password isn't complex enough`, () => {
+        const userPasswordNotComplex = {
+          email: 'test@email.com',
+          password: '11AAaabb'
+        };
+        return supertest(app)
+          .post('/api/users')
+          .send(userPasswordNotComplex)
+          .expect(400, {
+            error: `Password must contain 1 upper case, lower case, number and special character`
+          });
+      });
     });
   });
 });
