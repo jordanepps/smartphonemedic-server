@@ -1,5 +1,4 @@
 const knex = require('knex');
-// const bcrypt = require('bcryptjs');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
@@ -8,7 +7,6 @@ describe('Users Endpoint', () => {
 
   const testUsers = helpers.makeUsersArray();
   const allowedUsers = helpers.makeAllowedUsersArray();
-  //   const testUser = testUsers[0];
 
   before('make knex instance', () => {
     db = knex({
