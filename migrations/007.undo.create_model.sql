@@ -1,0 +1,4 @@
+ALTER TABLE model
+    DROP COLUMN IF EXISTS make_id;
+
+DROP TABLE IF EXISTS model;

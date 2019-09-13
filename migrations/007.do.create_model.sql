@@ -1,0 +1,6 @@
+CREATE TABLE model
+(
+    id SERIAL PRIMARY KEY,
+    make_id INTEGER REFERENCES make(id) ON DELETE CASCADE NOT NULL,
+    model_name TEXT NOT NULL
+);
