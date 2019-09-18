@@ -51,10 +51,18 @@ function makeAllowedUsersArray() {
   ];
 }
 
+function makeDeviceMakeArray() {
+  return [
+    { id: 1, make_name: 'Apple' },
+    { id: 2, make_name: 'Samsung' },
+    { id: 3, make_name: 'LG' }
+  ];
+}
+
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
-      users, allowed
+      users, allowed, make
       RESTART IDENTITY CASCADE`
   );
 }
@@ -88,6 +96,17 @@ function seedAllowed(db, allowed) {
     );
 }
 
+function seedMakes(db, makes) {
+  const preppedMakes = makes.map(make => ({ ...make }));
+
+  return db
+    .into('make')
+    .insert(preppedMakes)
+    .then(() =>
+      db.raw(`SELECT setval('make_id_seq', ?)`, [makes[makes.length - 1].id])
+    );
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.email,
@@ -100,8 +119,10 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 module.exports = {
   makeUsersArray,
   makeAllowedUsersArray,
+  makeDeviceMakeArray,
   cleanTables,
   seedUsers,
   makeAuthHeader,
-  seedAllowed
+  seedAllowed,
+  seedMakes
 };

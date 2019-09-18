@@ -8,6 +8,8 @@ describe.only('device endpoint', () => {
 
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
+  const testMakes = helpers.makeDeviceMakeArray();
+  const testMake = testMakes[0];
 
   before('make knex instance', () => {
     db = knex({
@@ -25,22 +27,29 @@ describe.only('device endpoint', () => {
 
   describe('POST /api/device/...', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
     context('make', () => {
-      it(`responds 401 when unauthorized user posts 'make'`, () => {
+      it(`responds 401 when unauthorized user posts 'make_name'`, () => {
         return supertest(app)
           .post('/api/device/make')
-          .send({ make: 'Apple' })
+          .send(testMake)
           .expect(401);
       });
 
-      it(`responds 400 when required error when 'make' is missing`, () => {
+      it(`responds 400 when required error when 'make_name' is missing`, () => {
         return supertest(app)
           .post('/api/device/make')
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(400, { error: `Missing 'make' in request body` });
+          .expect(400, { error: `Missing 'make_name' in request body` });
       });
 
-      // it(`'responds 400 when 'make' already exists`);
+      it(`'responds 400 when 'make_name' already exists`, () => {
+        return supertest(app)
+          .post('/api/device/make')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(testMake)
+          .expect(400, { error: `'${testMake.make_name}' already exists` });
+      });
     });
   });
 });
