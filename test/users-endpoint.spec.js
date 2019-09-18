@@ -7,6 +7,7 @@ describe('Users Endpoint', () => {
 
   const testUsers = helpers.makeUsersArray();
   const allowedUsers = helpers.makeAllowedUsersArray();
+  const testUser = testUsers[0];
 
   before('make knex instance', () => {
     db = knex({
@@ -118,6 +119,13 @@ describe('Users Endpoint', () => {
           .post('/api/users')
           .send(notAllowedUser)
           .expect(400, { error: `Email provided is not allowed to register` });
+      });
+
+      it(`responds 400 when email is already registered`, () => {
+        return supertest(app)
+          .post('/api/users')
+          .send(testUser)
+          .expect(400, { error: 'Email already registered' });
       });
 
       it(`responds 201 when allowed user is registered`, () => {

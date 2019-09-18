@@ -7,6 +7,11 @@ const jsonBodyParser = express.json();
 deviceRouter
   .route('/make')
   .all(requireAuth)
-  .post(jsonBodyParser, (req, res, next) => {});
+  .post(jsonBodyParser, (req, res, next) => {
+    const { make } = req.body;
+
+    if (!make)
+      return res.status(400).json({ error: `Missing 'make' in request body` });
+  });
 
 module.exports = deviceRouter;

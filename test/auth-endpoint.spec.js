@@ -68,7 +68,7 @@ describe('auth endpoint', () => {
 
   describe('POST /api/auth/refresh', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-
+    //HANDLE EXPIRED REFRESH
     it('responds 200 and JWT auth token using secret', () => {
       const expectedToken = jwt.sign(
         { user_id: testUser.id },
