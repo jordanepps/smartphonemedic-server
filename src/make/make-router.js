@@ -1,13 +1,13 @@
 const express = require('express');
 const path = require('path');
-const DeviceService = require('./device-service');
+const DeviceService = require('./make-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
-const deviceRouter = express.Router();
+const makeRouter = express.Router();
 const jsonBodyParser = express.json();
 
-deviceRouter
-  .route('/make')
+makeRouter
+  .route('/')
   .all(requireAuth)
   .get((req, res, next) => {
     const { getAll, serialize } = DeviceService.make;
@@ -41,4 +41,4 @@ deviceRouter
     });
   });
 
-module.exports = deviceRouter;
+module.exports = makeRouter;

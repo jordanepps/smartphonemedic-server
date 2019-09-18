@@ -24,7 +24,7 @@ describe.only('device endpoint', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe('GET /api/device...', () => {
+  describe('GET /api/device/...', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
 
