@@ -9,6 +9,13 @@ const jsonBodyParser = express.json();
 deviceRouter
   .route('/make')
   .all(requireAuth)
+  .get((req, res, next) => {
+    const { getAll, serialize } = DeviceService.make;
+
+    getAll(req.app.get('db'))
+      .then(makes => res.json(makes.map(serialize)))
+      .catch(next);
+  })
   .post(jsonBodyParser, (req, res, next) => {
     const { make_name } = req.body;
 

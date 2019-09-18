@@ -2,6 +2,9 @@ const xss = require('xss');
 
 const DeviceService = {
   make: {
+    getAll(db) {
+      return db('make').select('*');
+    },
     insert(db, make_name) {
       return db
         .insert(make_name)

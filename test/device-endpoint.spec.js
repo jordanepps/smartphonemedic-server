@@ -24,6 +24,26 @@ describe.only('device endpoint', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
+  describe('GET /api/device...', () => {
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
+
+    context('make', () => {
+      it('responds 401 when unauthorized user makes get request', () => {
+        return supertest(app)
+          .get('/api/device/make')
+          .expect(401);
+      });
+
+      it('responds with 200 and all makes', () => {
+        return supertest(app)
+          .get('/api/device/make')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200, testMakes);
+      });
+    });
+  });
+
   describe('POST /api/device/...', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
