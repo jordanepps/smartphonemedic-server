@@ -41,4 +41,18 @@ makeRouter
     });
   });
 
+makeRouter
+  .route('/:make_id')
+  .all(requireAuth)
+  .all((req, res, next) => {
+    const { getById } = DeviceService.make;
+
+    getById(req.app.get('db'), req.params.make_id).then(make => {
+      if (make) return res.status(404).json({ error: 'Make does not exist' });
+      res.make = make;
+      next();
+    });
+  })
+  .get((req, res, next) => {});
+
 module.exports = makeRouter;

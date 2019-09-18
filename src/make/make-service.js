@@ -5,6 +5,12 @@ const DeviceService = {
     getAll(db) {
       return db('make').select('*');
     },
+    getById(db, id) {
+      return db('make')
+        .select('*')
+        .where({ id })
+        .first();
+    },
     insert(db, make_name) {
       return db
         .insert(make_name)

@@ -2,13 +2,14 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('device endpoint', () => {
+describe.only('device make endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
   const testMakes = helpers.makeDeviceMakeArray();
   const testMake = testMakes[0];
+  const makeUrl = '/api/device/make';
 
   before('make knex instance', () => {
     db = knex({
@@ -24,47 +25,42 @@ describe.only('device endpoint', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe('GET /api/device/...', () => {
+  describe('/api/device/make', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
 
-    context('make', () => {
+    context('GET', () => {
       it('responds 401 when unauthorized user makes get request', () => {
         return supertest(app)
-          .get('/api/device/make')
+          .get(makeUrl)
           .expect(401);
       });
-
       it('responds with 200 and all makes', () => {
         return supertest(app)
-          .get('/api/device/make')
+          .get(makeUrl)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, testMakes);
       });
     });
-  });
 
-  describe('POST /api/device/...', () => {
-    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-    beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
-    context('make', () => {
+    context('POST', () => {
       it(`responds 401 when unauthorized user posts 'make_name'`, () => {
         return supertest(app)
-          .post('/api/device/make')
+          .post(makeUrl)
           .send(testMake)
           .expect(401);
       });
 
       it(`responds 400 when required error when 'make_name' is missing`, () => {
         return supertest(app)
-          .post('/api/device/make')
+          .post(makeUrl)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(400, { error: `Missing 'make_name' in request body` });
       });
 
       it(`responds 400 when 'make_name' already exists`, () => {
         return supertest(app)
-          .post('/api/device/make')
+          .post(makeUrl)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(testMake)
           .expect(400, { error: `'${testMake.make_name}' already exists` });
@@ -74,11 +70,31 @@ describe.only('device endpoint', () => {
         const validMake = { id: 4, make_name: 'htc' };
 
         return supertest(app)
-          .post('/api/device/make')
+          .post(makeUrl)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(validMake)
           .expect(201, validMake);
       });
     });
   });
+
+  // describe.only('/api/device/make/:make_id', () => {
+  //   beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+  //   beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
+
+  //   context('GET', () => {
+  //     it('responds 401 when unauthorized user makes get request', () => {
+  //       return supertest(app)
+  //         .get(`${makeUrl}/${testMake.id}`)
+  //         .expect(401);
+  //     });
+
+  //     it.only(`respond with 404 when no 'make_id' in database`, () => {
+  //       return supertest(app)
+  //         .get(`${makeUrl}/${99999}`)
+  //         .set('Authorization', helpers.makeAuthHeader(testUser))
+  //         .expect(404, { error: 'Make does not exist' });
+  //     });
+  //   });
+  // });
 });
