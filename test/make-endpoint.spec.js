@@ -95,6 +95,13 @@ describe.only('device make endpoint', () => {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(404, { error: 'Make does not exist' });
       });
+
+      it(`responds with 200 and make with valid request`, () => {
+        return supertest(app)
+          .get(`${makeUrl}/${testMake.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200, testMake);
+      });
     });
   });
 });
