@@ -48,11 +48,15 @@ makeRouter
     const { getById } = DeviceService.make;
 
     getById(req.app.get('db'), req.params.make_id).then(make => {
-      if (make) return res.status(404).json({ error: 'Make does not exist' });
+      if (!make) return res.status(404).json({ error: 'Make does not exist' });
       res.make = make;
+
       next();
     });
   })
-  .get((req, res, next) => {});
+  .get((req, res, next) => {
+    const { serialize } = DeviceService.make;
+    res.json(serialize(res.make));
+  });
 
 module.exports = makeRouter;

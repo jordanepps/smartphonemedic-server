@@ -78,23 +78,23 @@ describe.only('device make endpoint', () => {
     });
   });
 
-  // describe.only('/api/device/make/:make_id', () => {
-  //   beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-  //   beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
+  describe.only('/api/device/make/:make_id', () => {
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
 
-  //   context('GET', () => {
-  //     it('responds 401 when unauthorized user makes get request', () => {
-  //       return supertest(app)
-  //         .get(`${makeUrl}/${testMake.id}`)
-  //         .expect(401);
-  //     });
+    context('GET', () => {
+      it('responds 401 when unauthorized user makes get request', () => {
+        return supertest(app)
+          .get(`${makeUrl}/${testMake.id}`)
+          .expect(401);
+      });
 
-  //     it.only(`respond with 404 when no 'make_id' in database`, () => {
-  //       return supertest(app)
-  //         .get(`${makeUrl}/${99999}`)
-  //         .set('Authorization', helpers.makeAuthHeader(testUser))
-  //         .expect(404, { error: 'Make does not exist' });
-  //     });
-  //   });
-  // });
+      it(`respond with 404 when no 'make_id' in database`, () => {
+        return supertest(app)
+          .get(`${makeUrl}/${99999}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Make does not exist' });
+      });
+    });
+  });
 });

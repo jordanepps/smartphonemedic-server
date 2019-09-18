@@ -26,6 +26,7 @@ app.get('/api', (req, res) => {
 });
 
 app.use(function errorHandler(error, req, res, next) {
+  console.log('!!!!!', error);
   res.status(500).json({ message: error.message, error });
 });
 

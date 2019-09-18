@@ -7,7 +7,6 @@ const DeviceService = {
     },
     getById(db, id) {
       return db('make')
-        .select('*')
         .where({ id })
         .first();
     },
