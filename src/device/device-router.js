@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const DeviceService = require('./device-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
@@ -16,14 +17,21 @@ deviceRouter
         .status(400)
         .json({ error: `Missing 'make_name' in request body` });
 
-    DeviceService.getMakeThatExists(req.app.get('db'), make_name).then(
-      dbMake => {
-        if (dbMake)
-          return res
-            .status(400)
-            .json({ error: `'${make_name}' already exists` });
-      }
-    );
+    const { insert, hasMake, serialize } = DeviceService.make;
+
+    hasMake(req.app.get('db'), make_name).then(dbMake => {
+      if (dbMake)
+        return res.status(400).json({ error: `'${make_name}' already exists` });
+
+      return insert(req.app.get('db'), { make_name })
+        .then(make =>
+          res
+            .status(201)
+            .location(path.posix.join(req.originalUrl, `/${make.id}`))
+            .json(serialize(make))
+        )
+        .catch(next);
+    });
   });
 
 module.exports = deviceRouter;

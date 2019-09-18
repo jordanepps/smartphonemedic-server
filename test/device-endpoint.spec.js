@@ -1,5 +1,4 @@
 const knex = require('knex');
-const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
@@ -43,12 +42,22 @@ describe.only('device endpoint', () => {
           .expect(400, { error: `Missing 'make_name' in request body` });
       });
 
-      it(`'responds 400 when 'make_name' already exists`, () => {
+      it(`responds 400 when 'make_name' already exists`, () => {
         return supertest(app)
           .post('/api/device/make')
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(testMake)
           .expect(400, { error: `'${testMake.make_name}' already exists` });
+      });
+
+      it(`responds 201 when 'make_name' is added`, () => {
+        const validMake = { id: 4, make_name: 'htc' };
+
+        return supertest(app)
+          .post('/api/device/make')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(validMake)
+          .expect(201, validMake);
       });
     });
   });

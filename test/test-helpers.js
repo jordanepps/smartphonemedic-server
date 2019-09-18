@@ -53,9 +53,9 @@ function makeAllowedUsersArray() {
 
 function makeDeviceMakeArray() {
   return [
-    { id: 1, make_name: 'Apple' },
-    { id: 2, make_name: 'Samsung' },
-    { id: 3, make_name: 'LG' }
+    { id: 1, make_name: 'apple' },
+    { id: 2, make_name: 'samsung' },
+    { id: 3, make_name: 'lg' }
   ];
 }
 
@@ -112,7 +112,7 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
     subject: user.email,
     algorithm: 'HS256'
   });
-  // console.log(token);
+
   return `Bearer ${token}`;
 }
 
