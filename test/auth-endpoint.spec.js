@@ -83,7 +83,7 @@ describe('auth endpoint', () => {
       return supertest(app)
         .post('/api/auth/refresh')
         .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200);
+        .expect(200, { authToken: expectedToken });
     });
   });
 });

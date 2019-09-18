@@ -119,6 +119,18 @@ describe('Users Endpoint', () => {
           .send(notAllowedUser)
           .expect(400, { error: `Email provided is not allowed to register` });
       });
+
+      it(`responds 201 when allowed user is registered`, () => {
+        const allowedUser = {
+          email: 'allowed@email.com',
+          password: '1Aa!2Bb@'
+        };
+
+        return supertest(app)
+          .post('/api/users')
+          .send(allowedUser)
+          .expect(201);
+      });
     });
   });
 });
