@@ -2,14 +2,14 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('device make endpoint', () => {
+describe('device make endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
   const testMakes = helpers.makeDeviceMakeArray();
   const testMake = testMakes[0];
-  const makeUrl = '/api/device/make';
+  const makeUrl = '/api/device-make';
 
   before('make knex instance', () => {
     db = knex({
@@ -25,7 +25,7 @@ describe.only('device make endpoint', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe('/api/device/make', () => {
+  describe('/api/device-make', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
 
@@ -78,7 +78,7 @@ describe.only('device make endpoint', () => {
     });
   });
 
-  describe('/api/device/make/:make_id', () => {
+  describe('/api/device-make/:make_id', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
 

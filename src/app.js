@@ -8,6 +8,7 @@ const { NODE_ENV } = require('./config');
 const authRouter = require('./auth/auth-router');
 const userRouter = require('./users/users-router');
 const makeRouter = require('./make/make-router');
+const colorRouter = require('./color/color-router');
 
 const app = express();
 
@@ -19,7 +20,8 @@ app.use(helmet());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
-app.use('/api/device/make', makeRouter);
+app.use('/api/device-make', makeRouter);
+app.use('/api/device-color', colorRouter);
 
 app.get('/api', (req, res) => {
   res.send('SPM API');
