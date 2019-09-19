@@ -51,7 +51,7 @@ describe.only('device make endpoint', () => {
           .expect(401);
       });
 
-      it(`responds 400 when required error when 'make_name' is missing`, () => {
+      it(`responds 400 when 'make_name' is missing`, () => {
         return supertest(app)
           .post(makeUrl)
           .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -78,7 +78,7 @@ describe.only('device make endpoint', () => {
     });
   });
 
-  describe.only('/api/device/make/:make_id', () => {
+  describe('/api/device/make/:make_id', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
 
@@ -101,6 +101,63 @@ describe.only('device make endpoint', () => {
           .get(`${makeUrl}/${testMake.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, testMake);
+      });
+    });
+
+    context('PATCH', () => {
+      it('responds 401 when unauthorized user makes patch request', () => {
+        const patchTest = { make_name: 'htc' };
+        return supertest(app)
+          .patch(`${makeUrl}/${testMake.id}`)
+          .send(patchTest)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'make_name' is missing`, () => {
+        return supertest(app)
+          .patch(`${makeUrl}/${testMake.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'make_name' in request body` });
+      });
+
+      it(`responds with 400 when 'make_name' is already taken`, () => {
+        const patchTest = { make_name: 'apple' };
+        return supertest(app)
+          .patch(`${makeUrl}/${testMake.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(400, { error: `'${patchTest.make_name}' already taken` });
+      });
+
+      it(`responds with 204 when 'make_name' is updated`, () => {
+        const patchTest = { make_name: 'htc' };
+        return supertest(app)
+          .patch(`${makeUrl}/${testMake.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(204);
+      });
+    });
+
+    context('DELETE', () => {
+      it('responds 401 when unauthorized user makes delete request', () => {
+        return supertest(app)
+          .delete(`${makeUrl}/${testMake.id}`)
+          .expect(401);
+      });
+
+      it(`responds 404 when no make exists to delete`, () => {
+        return supertest(app)
+          .delete(`${makeUrl}/99999`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Make does not exist' });
+      });
+
+      it('responds with 204 and removes make', () => {
+        return supertest(app)
+          .delete(`${makeUrl}/${testMake.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(204);
       });
     });
   });
