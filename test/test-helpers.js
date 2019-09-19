@@ -59,6 +59,27 @@ function makeDeviceMakeArray() {
   ];
 }
 
+function makeDeviceColorArray() {
+  return [
+    {
+      id: 1,
+      color_name: 'space gray'
+    },
+    {
+      id: 2,
+      color_name: 'silver'
+    },
+    {
+      id: 3,
+      color_name: 'gold'
+    },
+    {
+      id: 4,
+      color_name: 'red'
+    }
+  ];
+}
+
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
@@ -107,6 +128,17 @@ function seedMakes(db, makes) {
     );
 }
 
+function seedColors(db, colors) {
+  const preppedColors = colors.map(color => ({ ...color }));
+
+  return db
+    .into('color')
+    .insert(preppedColors)
+    .then(() =>
+      db.raw(`SELECT setval('color_id_seq', ?)`, [colors[colors.length - 1].id])
+    );
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.email,
@@ -120,9 +152,11 @@ module.exports = {
   makeUsersArray,
   makeAllowedUsersArray,
   makeDeviceMakeArray,
+  makeDeviceColorArray,
   cleanTables,
   seedUsers,
   makeAuthHeader,
   seedAllowed,
-  seedMakes
+  seedMakes,
+  seedColors
 };

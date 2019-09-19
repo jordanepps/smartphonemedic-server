@@ -7,6 +7,8 @@ describe.only('device color endpoint', () => {
 
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
+  const testColors = helpers.makeDeviceColorArray();
+  const testColor = testColors[0];
 
   const colorUrl = '/api/device-color';
 
@@ -26,7 +28,7 @@ describe.only('device color endpoint', () => {
 
   describe('/api/device-color', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-    // beforeEach('insert makes', () => helpers.seedMakes(db, testMakes));
+    beforeEach('insert colors', () => helpers.seedColors(db, testColors));
 
     context('GET', () => {
       it(`responds 401 when unauthorized user makes get request`, () => {
@@ -40,6 +42,14 @@ describe.only('device color endpoint', () => {
           .get(colorUrl)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200);
+      });
+    });
+
+    context('POST', () => {
+      it('responds 401 when unauthorized post attempt is made', () => {
+        return supertest(app)
+          .post(testColor)
+          .expect(401);
       });
     });
   });

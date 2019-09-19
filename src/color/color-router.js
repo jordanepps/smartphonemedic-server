@@ -15,6 +15,7 @@ colorRouter
     getAll(req.app.get('db'))
       .then(colors => res.json(colors.map(serialize)))
       .catch(next);
-  });
+  })
+  .post((req, res, next) => {});
 
 module.exports = colorRouter;
