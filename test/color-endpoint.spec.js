@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('device color endpoint', () => {
+describe.only('device color endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -33,6 +33,13 @@ describe('device color endpoint', () => {
         return supertest(app)
           .get(colorUrl)
           .expect(401);
+      });
+
+      it('responds with 200 and colors', () => {
+        return supertest(app)
+          .get(colorUrl)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200);
       });
     });
   });
