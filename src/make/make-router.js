@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const DeviceService = require('./make-service');
+const MakeService = require('./make-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const makeRouter = express.Router();
@@ -14,11 +14,9 @@ const {
   hasMake,
   deleteMake,
   serialize
-} = DeviceService.make;
+} = MakeService;
 
 function checkIfMakeExists(req, res, next) {
-  const { getById } = DeviceService.make;
-
   getById(req.app.get('db'), req.params.make_id).then(make => {
     if (!make) return res.status(404).json({ error: 'Make does not exist' });
     res.make = make;
@@ -30,13 +28,11 @@ function checkIfMakeExists(req, res, next) {
 makeRouter
   .route('/')
   .all(requireAuth)
-  .get((req, res, next) => {
-    // const { getAll, serialize } = DeviceService.make;
-
+  .get((req, res, next) =>
     getAll(req.app.get('db'))
       .then(makes => res.json(makes.map(serialize)))
-      .catch(next);
-  })
+      .catch(next)
+  )
   .post(jsonBodyParser, (req, res, next) => {
     const { make_name } = req.body;
 
@@ -44,8 +40,6 @@ makeRouter
       return res
         .status(400)
         .json({ error: `Missing 'make_name' in request body` });
-
-    const { insert, hasMake, serialize } = DeviceService.make;
 
     hasMake(req.app.get('db'), make_name).then(dbMake => {
       if (dbMake)
@@ -66,18 +60,13 @@ makeRouter
   .route('/:make_id')
   .all(requireAuth)
   .all(checkIfMakeExists)
-  .get((req, res, next) => {
-    const { serialize } = DeviceService.make;
-    res.json(serialize(res.make));
-  })
+  .get((req, res, next) => res.json(serialize(res.make)))
   .patch(jsonBodyParser, (req, res, next) => {
     const { make_name } = req.body;
     if (!make_name)
       return res
         .status(400)
         .json({ error: `Missing 'make_name' in request body` });
-
-    const { hasMake, update } = DeviceService.make;
 
     hasMake(req.app.get('db'), make_name).then(dbMake => {
       if (dbMake)
@@ -88,10 +77,10 @@ makeRouter
         .catch(next);
     });
   })
-  .delete((req, res, next) => {
+  .delete((req, res, next) =>
     deleteMake(req.app.get('db'), req.params.make_id)
       .then(() => res.status(204).end())
-      .catch(next);
-  });
+      .catch(next)
+  );
 
 module.exports = makeRouter;
