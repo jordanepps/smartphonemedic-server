@@ -27,13 +27,13 @@ function checkIfMakeExists(req, res, next) {
 
 makeRouter
   .route('/')
-  .all(requireAuth)
+  .all(requireAuth, jsonBodyParser)
   .get((req, res, next) =>
     getAll(req.app.get('db'))
       .then(makes => res.json(makes.map(serialize)))
       .catch(next)
   )
-  .post(jsonBodyParser, (req, res, next) => {
+  .post((req, res, next) => {
     const { make_name } = req.body;
 
     if (!make_name)
@@ -58,10 +58,9 @@ makeRouter
 
 makeRouter
   .route('/:make_id')
-  .all(requireAuth)
-  .all(checkIfMakeExists)
+  .all(requireAuth, checkIfMakeExists, jsonBodyParser)
   .get((req, res, next) => res.json(serialize(res.make)))
-  .patch(jsonBodyParser, (req, res, next) => {
+  .patch((req, res, next) => {
     const { make_name } = req.body;
     if (!make_name)
       return res

@@ -8,7 +8,7 @@ const jsonBodyParser = express.json();
 
 colorRouter
   .route('/')
-  .all(requireAuth)
+  .all(requireAuth, jsonBodyParser)
   .get((req, res, next) => {});
 
 module.exports = colorRouter;
