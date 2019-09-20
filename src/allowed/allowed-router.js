@@ -12,11 +12,12 @@ const {
   hasAllowed,
   insert,
   update,
+  deleteAllowed,
   serialize
 } = AllowedService;
 
 function checkIfAllowedExists(req, res, next) {
-  getById(req.app.get('db'), req.params.route_id).then(email => {
+  getById(req.app.get('db'), req.params.allowed_id).then(email => {
     if (!email) return res.status(404).json({ error: 'Email does not exist' });
     res.email = email;
 
@@ -50,7 +51,7 @@ allowedRouter
   });
 
 allowedRouter
-  .route('/:route_id')
+  .route('/:allowed_id')
   .all(requireAuth, checkIfAllowedExists, jsonBodyParser)
   .patch((req, res, next) => {
     const { email } = req.body;
@@ -63,10 +64,14 @@ allowedRouter
         return res.status(400).json({ error: `'${email}' already added` });
     });
 
-    update(req.app.get('db'), req.params.route_id, { email })
+    update(req.app.get('db'), req.params.allowed_id, { email })
       .then(numRowsAffected => res.status(204).end())
       .catch(next);
   })
-  .delete();
+  .delete((req, res, next) => {
+    deleteAllowed(req.app.get('db'), req.params.allowed_id)
+      .then(() => res.status(204).end())
+      .catch(next);
+  });
 
 module.exports = allowedRouter;

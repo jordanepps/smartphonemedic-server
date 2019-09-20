@@ -47,7 +47,7 @@ describe.only('allowed users endpoint', () => {
       });
     });
 
-    context.only('POST', () => {
+    context('POST', () => {
       it('responds 401 when unauthorized post attempt is made', () => {
         return supertest(app)
           .post(url)
@@ -88,7 +88,7 @@ describe.only('allowed users endpoint', () => {
       helpers.seedAllowed(db, testAllowedUsers)
     );
 
-    context.only('PATCH', () => {
+    context('PATCH', () => {
       it('responds 401 when unauthorized user makes patch request', () => {
         const patchTest = { email: 'test@test.com' };
         return supertest(app)
@@ -114,11 +114,33 @@ describe.only('allowed users endpoint', () => {
       });
 
       it(`responds with 204 when 'email' is updated`, () => {
-        const patchTest = { email: 'red' };
+        const patchTest = { email: 'red@email.com' };
         return supertest(app)
           .patch(`${url}/${testAllowed.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(patchTest)
+          .expect(204);
+      });
+    });
+
+    context('DELETE', () => {
+      it('responds 401 when unauthorized user makes delete request', () => {
+        return supertest(app)
+          .delete(`${url}/${testAllowed.id}`)
+          .expect(401);
+      });
+
+      it(`responds 404 when no allowed email exists to delete`, () => {
+        return supertest(app)
+          .delete(`${url}/99999`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Email does not exist' });
+      });
+
+      it('responds with 204 and removes allowed email', () => {
+        return supertest(app)
+          .delete(`${url}/${testAllowed.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(204);
       });
     });

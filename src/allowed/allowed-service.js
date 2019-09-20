@@ -25,7 +25,7 @@ const AllowedService = {
       .where({ id })
       .update(email);
   },
-  delete(db, id) {
+  deleteAllowed(db, id) {
     return db('allowed')
       .where({ id })
       .delete();
