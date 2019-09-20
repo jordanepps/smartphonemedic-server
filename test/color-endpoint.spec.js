@@ -28,7 +28,6 @@ describe.only('device color endpoint', () => {
 
   describe('/api/device-color', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-    //TODO:Figure out why this does not work
     beforeEach('insert colors', () => helpers.seedColors(db, testColors));
 
     context('GET', () => {
@@ -46,7 +45,7 @@ describe.only('device color endpoint', () => {
       });
     });
 
-    context.only('POST', () => {
+    context('POST', () => {
       it('responds 401 when unauthorized post attempt is made', () => {
         return supertest(app)
           .post(url)
@@ -77,6 +76,33 @@ describe.only('device color endpoint', () => {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(validColor)
           .expect(201, validColor);
+      });
+    });
+  });
+
+  describe('/api/device-color/:color_id', () => {
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert colors', () => helpers.seedColors(db, testColors));
+
+    context.only('GET', () => {
+      it('responds 401 when unauthorized user makes get request', () => {
+        return supertest(app)
+          .get(`${url}/${testColor.id}`)
+          .expect(401);
+      });
+
+      it(`respond with 404 when no 'make_id' in database`, () => {
+        return supertest(app)
+          .get(`${url}/${99999}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Color does not exist' });
+      });
+
+      it(`responds with 200 and make with valid request`, () => {
+        return supertest(app)
+          .get(`${url}/${testColor.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200, testColor);
       });
     });
   });

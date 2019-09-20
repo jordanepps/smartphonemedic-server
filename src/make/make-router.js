@@ -45,7 +45,7 @@ makeRouter
       if (dbMake)
         return res.status(400).json({ error: `'${make_name}' already exists` });
 
-      return insert(req.app.get('db'), { make_name })
+      insert(req.app.get('db'), { make_name })
         .then(make =>
           res
             .status(201)

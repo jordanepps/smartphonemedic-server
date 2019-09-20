@@ -4,6 +4,11 @@ const ColorService = {
   getAll(db) {
     return db('color').select('*');
   },
+  getById(db, id) {
+    return db('color')
+      .where({ id })
+      .first();
+  },
   hasColor(db, color_name) {
     return db('color')
       .where({ color_name })

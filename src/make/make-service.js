@@ -10,9 +10,8 @@ const MakeService = {
       .first();
   },
   insert(db, make_name) {
-    return db
+    return db('make')
       .insert(make_name)
-      .into('make')
       .returning('*')
       .then(([make]) => make);
   },

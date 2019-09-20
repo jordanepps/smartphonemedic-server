@@ -6,7 +6,16 @@ const { requireAuth } = require('../middleware/jwt-auth');
 const colorRouter = express.Router();
 const jsonBodyParser = express.json();
 
-const { getAll, hasColor, insert, serialize } = ColorService;
+const { getAll, hasColor, insert, getById, serialize } = ColorService;
+
+function checkIfColorExists(req, res, next) {
+  getById(req.app.get('db'), req.params.color_id).then(color => {
+    if (!color) return res.status(404).json({ error: 'Color does not exist' });
+    res.color = color;
+
+    next();
+  });
+}
 
 colorRouter
   .route('/')
@@ -40,5 +49,10 @@ colorRouter
         .catch(next);
     });
   });
+
+colorRouter
+  .route('/:color_id')
+  .all(requireAuth, checkIfColorExists, jsonBodyParser)
+  .get((req, res, next) => res.json(serialize(res.color)));
 
 module.exports = colorRouter;
