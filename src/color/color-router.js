@@ -6,7 +6,15 @@ const { requireAuth } = require('../middleware/jwt-auth');
 const colorRouter = express.Router();
 const jsonBodyParser = express.json();
 
-const { getAll, hasColor, insert, getById, update, serialize } = ColorService;
+const {
+  getAll,
+  hasColor,
+  insert,
+  getById,
+  update,
+  deleteColor,
+  serialize
+} = ColorService;
 
 function checkIfColorExists(req, res, next) {
   getById(req.app.get('db'), req.params.color_id).then(color => {
@@ -69,6 +77,11 @@ colorRouter
 
     update(req.app.get('db'), req.params.color_id, { color_name })
       .then(numRowsAffected => res.status(204).end())
+      .catch(next);
+  })
+  .delete((req, res, next) => {
+    deleteColor(req.app.get('db'), req.params.color_id)
+      .then(() => res.status(204).end())
       .catch(next);
   });
 

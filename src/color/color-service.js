@@ -19,6 +19,11 @@ const ColorService = {
       .where({ id })
       .update(color_name);
   },
+  deleteColor(db, id) {
+    return db('color')
+      .where({ id })
+      .delete();
+  },
   insert(db, color_name) {
     return db('color')
       .insert(color_name)

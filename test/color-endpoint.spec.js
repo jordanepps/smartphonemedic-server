@@ -106,7 +106,7 @@ describe.only('device color endpoint', () => {
       });
     });
 
-    context.only('PATCH', () => {
+    context('PATCH', () => {
       it('responds 401 when unauthorized user makes patch request', () => {
         const patchTest = { color_name: 'red' };
         return supertest(app)
@@ -137,6 +137,28 @@ describe.only('device color endpoint', () => {
           .patch(`${url}/${testColor.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(patchTest)
+          .expect(204);
+      });
+    });
+
+    context('DELETE', () => {
+      it('responds 401 when unauthorized user makes delete request', () => {
+        return supertest(app)
+          .delete(`${url}/${testColor.id}`)
+          .expect(401);
+      });
+
+      it(`responds 404 when no make exists to delete`, () => {
+        return supertest(app)
+          .delete(`${url}/99999`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Color does not exist' });
+      });
+
+      it('responds with 204 and removes make', () => {
+        return supertest(app)
+          .delete(`${url}/${testColor.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(204);
       });
     });
