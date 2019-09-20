@@ -46,5 +46,39 @@ describe.only('allowed users endpoint', () => {
           .expect(200, testAllowedUsers);
       });
     });
+
+    context.only('POST', () => {
+      it('responds 401 when unauthorized post attempt is made', () => {
+        return supertest(app)
+          .post(url)
+          .send(testAllowed)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'email' is missing`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'email' in request body` });
+      });
+
+      it(`responds 400 when 'email' already exists`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(testAllowed)
+          .expect(400, { error: `'${testAllowed.email}' already added` });
+      });
+
+      it(`responds 201 when 'email' is added`, () => {
+        const validEmail = { id: 6, email: 'test@test.com' };
+
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(validEmail)
+          .expect(201, validEmail);
+      });
+    });
   });
 });
