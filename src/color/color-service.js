@@ -14,6 +14,11 @@ const ColorService = {
       .where({ color_name })
       .first();
   },
+  update(db, id, color_name) {
+    return db('color')
+      .where({ id })
+      .update(color_name);
+  },
   insert(db, color_name) {
     return db('color')
       .insert(color_name)

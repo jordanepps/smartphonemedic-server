@@ -84,7 +84,7 @@ describe.only('device color endpoint', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert colors', () => helpers.seedColors(db, testColors));
 
-    context.only('GET', () => {
+    context('GET', () => {
       it('responds 401 when unauthorized user makes get request', () => {
         return supertest(app)
           .get(`${url}/${testColor.id}`)
@@ -103,6 +103,41 @@ describe.only('device color endpoint', () => {
           .get(`${url}/${testColor.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, testColor);
+      });
+    });
+
+    context.only('PATCH', () => {
+      it('responds 401 when unauthorized user makes patch request', () => {
+        const patchTest = { color_name: 'red' };
+        return supertest(app)
+          .patch(`${url}/${testColor.id}`)
+          .send(patchTest)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'color_name' is missing`, () => {
+        return supertest(app)
+          .patch(`${url}/${testColor.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'color_name' in request body` });
+      });
+
+      it(`responds with 400 when 'color_name' is already taken`, () => {
+        const patchTest = { color_name: 'silver' };
+        return supertest(app)
+          .patch(`${url}/${testColor.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(400, { error: `'${patchTest.color_name}' already taken` });
+      });
+
+      it(`responds with 204 when 'color_name' is updated`, () => {
+        const patchTest = { color_name: 'red' };
+        return supertest(app)
+          .patch(`${url}/${testColor.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(204);
       });
     });
   });
