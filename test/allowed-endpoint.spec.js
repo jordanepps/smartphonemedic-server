@@ -81,4 +81,46 @@ describe.only('allowed users endpoint', () => {
       });
     });
   });
+
+  describe('/api/allowed/:allowed_id', () => {
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert allowed', () =>
+      helpers.seedAllowed(db, testAllowedUsers)
+    );
+
+    context.only('PATCH', () => {
+      it('responds 401 when unauthorized user makes patch request', () => {
+        const patchTest = { email: 'test@test.com' };
+        return supertest(app)
+          .patch(`${url}/${testAllowed.id}`)
+          .send(patchTest)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'email' is missing`, () => {
+        return supertest(app)
+          .patch(`${url}/${testAllowed.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'email' in request body` });
+      });
+
+      it(`responds with 400 when 'email' is already added`, () => {
+        const patchTest = { email: 'one@email.com' };
+        return supertest(app)
+          .patch(`${url}/${testAllowed.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(400, { error: `'${patchTest.email}' already added` });
+      });
+
+      it(`responds with 204 when 'email' is updated`, () => {
+        const patchTest = { email: 'red' };
+        return supertest(app)
+          .patch(`${url}/${testAllowed.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(204);
+      });
+    });
+  });
 });

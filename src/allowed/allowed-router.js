@@ -6,7 +6,23 @@ const { requireAuth } = require('../middleware/jwt-auth');
 const allowedRouter = express.Router();
 const jsonBodyParser = express.json();
 
-const { getAll, hasAllowed, insert, serialize } = AllowedService;
+const {
+  getAll,
+  getById,
+  hasAllowed,
+  insert,
+  update,
+  serialize
+} = AllowedService;
+
+function checkIfAllowedExists(req, res, next) {
+  getById(req.app.get('db'), req.params.route_id).then(email => {
+    if (!email) return res.status(404).json({ error: 'Email does not exist' });
+    res.email = email;
+
+    next();
+  });
+}
 
 allowedRouter
   .route('/')
@@ -32,5 +48,25 @@ allowedRouter
       );
     });
   });
+
+allowedRouter
+  .route('/:route_id')
+  .all(requireAuth, checkIfAllowedExists, jsonBodyParser)
+  .patch((req, res, next) => {
+    const { email } = req.body;
+
+    if (!email)
+      return res.status(400).json({ error: `Missing 'email' in request body` });
+
+    hasAllowed(req.app.get('db'), email).then(dbEmail => {
+      if (dbEmail)
+        return res.status(400).json({ error: `'${email}' already added` });
+    });
+
+    update(req.app.get('db'), req.params.route_id, { email })
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next);
+  })
+  .delete();
 
 module.exports = allowedRouter;
