@@ -72,10 +72,6 @@ function makeDeviceColorArray() {
     {
       id: 3,
       color_name: 'gold'
-    },
-    {
-      id: 4,
-      color_name: 'red'
     }
   ];
 }
@@ -83,7 +79,7 @@ function makeDeviceColorArray() {
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
-      users, allowed, make
+      users, allowed, make, color
       RESTART IDENTITY CASCADE`
   );
 }
