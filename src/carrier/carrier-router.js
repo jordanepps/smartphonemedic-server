@@ -61,6 +61,7 @@ carrierRouter
 
 carrierRouter
   .route('/:carrier_id')
-  .all(requireAuth, checkIfCarrierExists, jsonBodyParser);
+  .all(requireAuth, checkIfCarrierExists, jsonBodyParser)
+  .get((req, res, next) => res.json(serialize(res.carrier)));
 
 module.exports = carrierRouter;
