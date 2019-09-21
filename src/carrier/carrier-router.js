@@ -30,9 +30,33 @@ carrierRouter
   .route('/')
   .all(requireAuth, jsonBodyParser)
   .get((req, res, next) => {
-    getAll(req.app.get('db')).then(carriers =>
-      res.json(carriers.map(serialize))
-    );
+    getAll(req.app.get('db'))
+      .then(carriers => res.json(carriers.map(serialize)))
+      .catch(next);
+  })
+  .post((req, res, next) => {
+    const { carrier_name } = req.body;
+
+    if (!carrier_name)
+      return res
+        .status(400)
+        .json({ error: `Missing 'carrier_name' in request body` });
+
+    hasCarrier(req.app.get('db'), carrier_name)
+      .then(dbCarrier => {
+        if (dbCarrier)
+          return res
+            .status(400)
+            .json({ error: `'${carrier_name}' already exists` });
+
+        insert(req.app.get('db'), { carrier_name }).then(carrier =>
+          res
+            .status(201)
+            .location(path.posix.join(req.originalUrl, `/${carrier.id}`))
+            .json(serialize(carrier))
+        );
+      })
+      .catch(next);
   });
 
 carrierRouter

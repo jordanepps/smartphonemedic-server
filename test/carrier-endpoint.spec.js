@@ -44,5 +44,41 @@ describe.only('device color endpoint', () => {
           .expect(200, testCarriers);
       });
     });
+
+    context.only('POST', () => {
+      it('responds 401 when unauthorized post attempt is made', () => {
+        return supertest(app)
+          .post(url)
+          .send(testCarrier)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'carrier_name' is missing`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'carrier_name' in request body` });
+      });
+
+      it(`responds 400 when 'carrier_name' already exists`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(testCarrier)
+          .expect(400, {
+            error: `'${testCarrier.carrier_name}' already exists`
+          });
+      });
+
+      it(`responds 201 when 'carrier_name' is added`, () => {
+        const validCarrier = { id: 4, carrier_name: 'cricket' };
+
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(validCarrier)
+          .expect(201, validCarrier);
+      });
+    });
   });
 });
