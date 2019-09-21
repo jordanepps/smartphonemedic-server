@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('allowed users endpoint', () => {
+describe('allowed users endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
