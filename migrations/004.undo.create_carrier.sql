@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS carriers;
+DROP TABLE IF EXISTS carrier;
