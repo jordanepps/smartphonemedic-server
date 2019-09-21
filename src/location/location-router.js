@@ -63,7 +63,25 @@ locationRouter
   .route('/:location_id')
   .all(requireAuth, checkIfLocationExists, jsonBodyParser)
   .get((req, res, next) => res.json(serialize(res.location)))
-  .patch()
+  .patch((req, res, next) => {
+    const { location_name } = req.body;
+
+    if (!location_name)
+      return res
+        .status(400)
+        .json({ error: `Missing 'location_name' in request body` });
+
+    hasLocation(req.app.get('db'), location_name).then(dbLocation => {
+      if (dbLocation)
+        return res
+          .status(400)
+          .json({ error: `'${location_name}' already taken` });
+
+      update(req.app.get('db'), req.params.location_id, { location_name })
+        .then(numRowsAffected => res.status(204).end())
+        .catch(next);
+    });
+  })
   .delete();
 
 module.exports = locationRouter;

@@ -90,7 +90,7 @@ describe.only('location endpoint', () => {
       helpers.seedLocations(db, testLocations)
     );
 
-    context.only('GET', () => {
+    context('GET', () => {
       it('responds 401 when unauthorized user makes get request', () => {
         return supertest(app)
           .get(`${url}/${testLocation.id}`)
@@ -109,6 +109,41 @@ describe.only('location endpoint', () => {
           .get(`${url}/${testLocation.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, testLocation);
+      });
+    });
+
+    context.only('PATCH', () => {
+      it('responds 401 when unauthorized user makes patch request', () => {
+        const patchTest = { location_name: 'red' };
+        return supertest(app)
+          .patch(`${url}/${testLocation.id}`)
+          .send(patchTest)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'location_name' is missing`, () => {
+        return supertest(app)
+          .patch(`${url}/${testLocation.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'location_name' in request body` });
+      });
+
+      it(`responds with 400 when 'location_name' is already taken`, () => {
+        const patchTest = { location_name: 'gervais' };
+        return supertest(app)
+          .patch(`${url}/${testLocation.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(400, { error: `'${patchTest.location_name}' already taken` });
+      });
+
+      it(`responds with 204 when 'location_name' is updated`, () => {
+        const patchTest = { location_name: 'red' };
+        return supertest(app)
+          .patch(`${url}/${testLocation.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(204);
       });
     });
   });
