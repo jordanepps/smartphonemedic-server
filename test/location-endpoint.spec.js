@@ -83,4 +83,33 @@ describe.only('location endpoint', () => {
       });
     });
   });
+
+  describe('/api/location/:location_id', () => {
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert locations', () =>
+      helpers.seedLocations(db, testLocations)
+    );
+
+    context.only('GET', () => {
+      it('responds 401 when unauthorized user makes get request', () => {
+        return supertest(app)
+          .get(`${url}/${testLocation.id}`)
+          .expect(401);
+      });
+
+      it(`respond with 404 when no 'location_id' in database`, () => {
+        return supertest(app)
+          .get(`${url}/${99999}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Location does not exist' });
+      });
+
+      it(`responds with 200 and make with valid request`, () => {
+        return supertest(app)
+          .get(`${url}/${testLocation.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200, testLocation);
+      });
+    });
+  });
 });

@@ -19,7 +19,7 @@ const {
 function checkIfLocationExists(req, res, next) {
   getById(req.app.get('db'), req.params.location_id).then(location => {
     if (!location)
-      return res.status(404).json({ error: 'Color does not exist' });
+      return res.status(404).json({ error: 'Location does not exist' });
     res.location = location;
 
     next();
@@ -62,7 +62,7 @@ locationRouter
 locationRouter
   .route('/:location_id')
   .all(requireAuth, checkIfLocationExists, jsonBodyParser)
-  .get()
+  .get((req, res, next) => res.json(serialize(res.location)))
   .patch()
   .delete();
 
