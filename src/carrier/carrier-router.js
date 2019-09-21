@@ -26,7 +26,14 @@ function checkIfCarrierExists(req, res, next) {
   });
 }
 
-carrierRouter.route('/').all(requireAuth, jsonBodyParser);
+carrierRouter
+  .route('/')
+  .all(requireAuth, jsonBodyParser)
+  .get((req, res, next) => {
+    getAll(req.app.get('db')).then(carriers =>
+      res.json(carriers.map(serialize))
+    );
+  });
 
 carrierRouter
   .route('/:carrier_id')

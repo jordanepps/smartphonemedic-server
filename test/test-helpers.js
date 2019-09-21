@@ -76,10 +76,18 @@ function makeDeviceColorArray() {
   ];
 }
 
+function makeCarrierArray() {
+  return [
+    { id: 1, carrier_name: 'verizon' },
+    { id: 2, carrier_name: 't-mobile' },
+    { id: 3, carrier_name: 'at&t' }
+  ];
+}
+
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
-      users, allowed, make, color
+      users, allowed, make, color, carrier
       RESTART IDENTITY CASCADE`
   );
 }
@@ -135,6 +143,19 @@ function seedColors(db, colors) {
     );
 }
 
+function seedCarriers(db, carriers) {
+  const preppedCarriers = carriers.map(carrier => ({ ...carrier }));
+
+  return db
+    .into('carrier')
+    .insert(preppedCarriers)
+    .then(() =>
+      db.raw(`SELECT setval('carrier_id_seq', ?)`, [
+        carriers[carriers.length - 1].id
+      ])
+    );
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.email,
@@ -149,10 +170,12 @@ module.exports = {
   makeAllowedUsersArray,
   makeDeviceMakeArray,
   makeDeviceColorArray,
+  makeCarrierArray,
   cleanTables,
   seedUsers,
   makeAuthHeader,
   seedAllowed,
   seedMakes,
-  seedColors
+  seedColors,
+  seedCarriers
 };
