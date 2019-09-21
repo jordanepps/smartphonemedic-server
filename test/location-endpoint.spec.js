@@ -46,5 +46,41 @@ describe.only('location endpoint', () => {
           .expect(200, testLocations);
       });
     });
+
+    context.only('POST', () => {
+      it('responds 401 when unauthorized post attempt is made', () => {
+        return supertest(app)
+          .post(url)
+          .send(testLocation)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'location_name' is missing`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'location_name' in request body` });
+      });
+
+      it(`responds 400 when 'location_name' already exists`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(testLocation)
+          .expect(400, {
+            error: `'${testLocation.location_name}' already exists`
+          });
+      });
+
+      it(`responds 201 when 'location_name' is added`, () => {
+        const validLocation = { id: 4, location_name: 'red bank' };
+
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(validLocation)
+          .expect(201, validLocation);
+      });
+    });
   });
 });

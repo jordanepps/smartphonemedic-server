@@ -34,7 +34,30 @@ locationRouter
       .then(locations => res.json(locations.map(serialize)))
       .catch(next)
   )
-  .post();
+  .post((req, res, next) => {
+    const { location_name } = req.body;
+
+    if (!location_name)
+      return res
+        .status(400)
+        .json({ error: `Missing 'location_name' in request body` });
+
+    hasLocation(req.app.get('db'), location_name).then(dbLocation => {
+      if (dbLocation)
+        return res
+          .status(400)
+          .json({ error: `'${location_name}' already exists` });
+
+      insert(req.app.get('db'), { location_name })
+        .then(location =>
+          res
+            .status(201)
+            .location(path.posix.join(req.originalUrl, `/${location.id}`))
+            .json(serialize(location))
+        )
+        .catch(next);
+    });
+  });
 
 locationRouter
   .route('/:location_id')
