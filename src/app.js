@@ -10,6 +10,7 @@ const userRouter = require('./users/users-router');
 const makeRouter = require('./make/make-router');
 const colorRouter = require('./color/color-router');
 const allowedRouter = require('./allowed/allowed-router');
+const carrierRouter = require('./carrier/carrier-router');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(helmet());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
+app.use('/api/carrier', carrierRouter);
 app.use('/api/allowed', allowedRouter);
 app.use('/api/device-make', makeRouter);
 app.use('/api/device-color', colorRouter);
