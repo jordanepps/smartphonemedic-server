@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('location endpoint', () => {
+describe('location endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -47,7 +47,7 @@ describe.only('location endpoint', () => {
       });
     });
 
-    context.only('POST', () => {
+    context('POST', () => {
       it('responds 401 when unauthorized post attempt is made', () => {
         return supertest(app)
           .post(url)
@@ -112,7 +112,7 @@ describe.only('location endpoint', () => {
       });
     });
 
-    context.only('PATCH', () => {
+    context('PATCH', () => {
       it('responds 401 when unauthorized user makes patch request', () => {
         const patchTest = { location_name: 'red' };
         return supertest(app)
@@ -143,6 +143,28 @@ describe.only('location endpoint', () => {
           .patch(`${url}/${testLocation.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(patchTest)
+          .expect(204);
+      });
+    });
+
+    context('DELETE', () => {
+      it('responds 401 when unauthorized user makes delete request', () => {
+        return supertest(app)
+          .delete(`${url}/${testLocation.id}`)
+          .expect(401);
+      });
+
+      it(`responds 404 when no make exists to delete`, () => {
+        return supertest(app)
+          .delete(`${url}/99999`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Location does not exist' });
+      });
+
+      it('responds with 204 and removes make', () => {
+        return supertest(app)
+          .delete(`${url}/${testLocation.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(204);
       });
     });

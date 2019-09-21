@@ -82,6 +82,10 @@ locationRouter
         .catch(next);
     });
   })
-  .delete();
+  .delete((req, res, next) =>
+    deleteLocation(req.app.get('db'), req.params.location_id)
+      .then(() => res.status(204).end())
+      .catch(next)
+  );
 
 module.exports = locationRouter;
