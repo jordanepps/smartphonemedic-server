@@ -81,6 +81,11 @@ carrierRouter
     update(req.app.get('db'), req.params.carrier_id, { carrier_name })
       .then(numRowsAffected => res.status(204).end())
       .catch(next);
+  })
+  .delete((req, res, next) => {
+    deleteCarrier(req.app.get('db'), req.params.carrier_id)
+      .then(() => res.status(204).end())
+      .catch(next);
   });
 
 module.exports = carrierRouter;

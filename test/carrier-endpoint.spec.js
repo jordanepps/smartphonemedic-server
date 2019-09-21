@@ -108,7 +108,7 @@ describe.only('device color endpoint', () => {
       });
     });
 
-    context.only('PATCH', () => {
+    context('PATCH', () => {
       it('responds 401 when unauthorized user makes patch request', () => {
         const patchTest = { carrier_name: 'cricket' };
         return supertest(app)
@@ -139,6 +139,28 @@ describe.only('device color endpoint', () => {
           .patch(`${url}/${testCarrier.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(patchTest)
+          .expect(204);
+      });
+    });
+
+    context.only('DELETE', () => {
+      it('responds 401 when unauthorized user makes delete request', () => {
+        return supertest(app)
+          .delete(`${url}/${testCarrier.id}`)
+          .expect(401);
+      });
+
+      it(`responds 404 when no make exists to delete`, () => {
+        return supertest(app)
+          .delete(`${url}/99999`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Carrier does not exist' });
+      });
+
+      it('responds with 204 and removes make', () => {
+        return supertest(app)
+          .delete(`${url}/${testCarrier.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(204);
       });
     });
