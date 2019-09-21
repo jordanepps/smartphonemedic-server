@@ -86,7 +86,7 @@ describe.only('device color endpoint', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert carriers', () => helpers.seedCarriers(db, testCarriers));
 
-    context.only('GET', () => {
+    context('GET', () => {
       it('responds 401 when unauthorized user makes get request', () => {
         return supertest(app)
           .get(`${url}/${testCarrier.id}`)
@@ -105,6 +105,41 @@ describe.only('device color endpoint', () => {
           .get(`${url}/${testCarrier.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, testCarrier);
+      });
+    });
+
+    context.only('PATCH', () => {
+      it('responds 401 when unauthorized user makes patch request', () => {
+        const patchTest = { carrier_name: 'cricket' };
+        return supertest(app)
+          .patch(`${url}/${testCarrier.id}`)
+          .send(patchTest)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'carrier_name' is missing`, () => {
+        return supertest(app)
+          .patch(`${url}/${testCarrier.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'carrier_name' in request body` });
+      });
+
+      it(`responds with 400 when 'carrier_name' is already taken`, () => {
+        const patchTest = { carrier_name: 't-mobile' };
+        return supertest(app)
+          .patch(`${url}/${testCarrier.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(400, { error: `'${patchTest.carrier_name}' already taken` });
+      });
+
+      it(`responds with 204 when 'carrier_name' is updated`, () => {
+        const patchTest = { carrier_name: 'cricket' };
+        return supertest(app)
+          .patch(`${url}/${testCarrier.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(204);
       });
     });
   });

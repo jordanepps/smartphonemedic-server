@@ -62,6 +62,25 @@ carrierRouter
 carrierRouter
   .route('/:carrier_id')
   .all(requireAuth, checkIfCarrierExists, jsonBodyParser)
-  .get((req, res, next) => res.json(serialize(res.carrier)));
+  .get((req, res, next) => res.json(serialize(res.carrier)))
+  .patch((req, res, next) => {
+    const { carrier_name } = req.body;
+
+    if (!carrier_name)
+      return res
+        .status(400)
+        .json({ error: `Missing 'carrier_name' in request body` });
+
+    hasCarrier(req.app.get('db'), carrier_name).then(dbCarrier => {
+      if (dbCarrier)
+        return res
+          .status(400)
+          .json({ error: `'${carrier_name}' already taken` });
+    });
+
+    update(req.app.get('db'), req.params.carrier_id, { carrier_name })
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next);
+  });
 
 module.exports = carrierRouter;
