@@ -29,7 +29,11 @@ function checkIfLocationExists(req, res, next) {
 locationRouter
   .route('/')
   .all(requireAuth, jsonBodyParser)
-  .get()
+  .get((req, res, next) =>
+    getAll(req.app.get('db'))
+      .then(locations => res.json(locations.map(serialize)))
+      .catch(next)
+  )
   .post();
 
 locationRouter

@@ -84,10 +84,18 @@ function makeCarrierArray() {
   ];
 }
 
+function makeLocationArray() {
+  return [
+    { id: 1, location_name: 'gervais' },
+    { id: 2, location_name: 'garners ferry' },
+    { id: 3, location_name: 'lexington' }
+  ];
+}
+
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
-      users, allowed, make, color, carrier
+      users, allowed, make, color, carrier, location
       RESTART IDENTITY CASCADE`
   );
 }
@@ -156,6 +164,19 @@ function seedCarriers(db, carriers) {
     );
 }
 
+function seedLocations(db, locations) {
+  const preppedLocations = locations.map(location => ({ ...location }));
+
+  return db
+    .into('location')
+    .insert(preppedLocations)
+    .then(() =>
+      db.raw(`SELECT setval('location_id_seq', ?)`, [
+        locations[locations.length - 1].id
+      ])
+    );
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.email,
@@ -171,11 +192,13 @@ module.exports = {
   makeDeviceMakeArray,
   makeDeviceColorArray,
   makeCarrierArray,
+  makeLocationArray,
   cleanTables,
   seedUsers,
   makeAuthHeader,
   seedAllowed,
   seedMakes,
   seedColors,
-  seedCarriers
+  seedCarriers,
+  seedLocations
 };
