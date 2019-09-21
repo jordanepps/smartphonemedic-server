@@ -12,6 +12,7 @@ const colorRouter = require('./color/color-router');
 const allowedRouter = require('./allowed/allowed-router');
 const locationRouter = require('./location/location-router');
 const carrierRouter = require('./carrier/carrier-router');
+const storageRouter = require('./storage/storage-router');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/location', locationRouter);
 app.use('/api/allowed', allowedRouter);
 app.use('/api/device-make', makeRouter);
 app.use('/api/device-color', colorRouter);
+app.use('/api/device-storage', storageRouter);
 
 app.get('/api', (req, res) => {
   res.send('SPM API');
