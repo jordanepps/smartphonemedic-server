@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('device color endpoint', () => {
+describe('device color endpoint', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -143,7 +143,7 @@ describe.only('device color endpoint', () => {
       });
     });
 
-    context.only('DELETE', () => {
+    context('DELETE', () => {
       it('responds 401 when unauthorized user makes delete request', () => {
         return supertest(app)
           .delete(`${url}/${testCarrier.id}`)
