@@ -44,5 +44,39 @@ describe.only('device storage endpoint', () => {
           .expect(200, testSizes);
       });
     });
+
+    context.only('POST', () => {
+      it('responds 401 when unauthorized post attempt is made', () => {
+        return supertest(app)
+          .post(url)
+          .send(testSize)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'storage_size' is missing`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'storage_size' in request body` });
+      });
+
+      it(`responds 400 when 'storage_size' already exists`, () => {
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(testSize)
+          .expect(400, { error: `'${testSize.storage_size}' already exists` });
+      });
+
+      it(`responds 201 when 'storage_size' is added`, () => {
+        const validSize = { id: 4, storage_size: '128' };
+
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(validSize)
+          .expect(201, validSize);
+      });
+    });
   });
 });

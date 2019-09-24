@@ -33,7 +33,30 @@ storageRouter
       .then(size => res.json(size.map(serialize)))
       .catch(next);
   })
-  .post();
+  .post((req, res, next) => {
+    const { storage_size } = req.body;
+
+    if (!storage_size)
+      return res
+        .status(400)
+        .json({ error: `Missing 'storage_size' in request body` });
+
+    hasStorage(req.app.get('db'), storage_size).then(dbStorage => {
+      if (dbStorage)
+        return res
+          .status(400)
+          .json({ error: `'${storage_size}' already exists` });
+
+      insert(req.app.get('db'), { storage_size })
+        .then(size =>
+          res
+            .status(201)
+            .location(path.posix.join(req.originalUrl, `/${size.id}`))
+            .json(serialize(size))
+        )
+        .catch(next);
+    });
+  });
 
 storageRouter
   .route('/:storage_id')
