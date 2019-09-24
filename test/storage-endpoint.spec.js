@@ -45,7 +45,7 @@ describe.only('device storage endpoint', () => {
       });
     });
 
-    context.only('POST', () => {
+    context('POST', () => {
       it('responds 401 when unauthorized post attempt is made', () => {
         return supertest(app)
           .post(url)
@@ -76,6 +76,33 @@ describe.only('device storage endpoint', () => {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(validSize)
           .expect(201, validSize);
+      });
+    });
+  });
+
+  describe('/api/device-storage/:storage_id', () => {
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+    beforeEach('insert sizes', () => helpers.seedStorage(db, testSizes));
+
+    context.only('GET', () => {
+      it('responds 401 when unauthorized user makes get request', () => {
+        return supertest(app)
+          .get(`${url}/${testSize.id}`)
+          .expect(401);
+      });
+
+      it(`respond with 404 when no 'storage_id' in database`, () => {
+        return supertest(app)
+          .get(`${url}/${99999}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Storage size does not exist' });
+      });
+
+      it(`responds with 200 and make with valid request`, () => {
+        return supertest(app)
+          .get(`${url}/${testSize.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200, testSize);
       });
     });
   });

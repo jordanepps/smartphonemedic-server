@@ -61,7 +61,7 @@ storageRouter
 storageRouter
   .route('/:storage_id')
   .all(requireAuth, checkIfStorageExists, jsonBodyParser)
-  .get()
+  .get((req, res, next) => res.json(serialize(res.storage)))
   .patch()
   .delete();
 
