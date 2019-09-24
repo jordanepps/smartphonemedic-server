@@ -41,6 +41,11 @@ storageRouter
         .status(400)
         .json({ error: `Missing 'storage_size' in request body` });
 
+    if (isNaN(storage_size))
+      return res
+        .status(400)
+        .json({ error: `'${storage_size}' is not a number` });
+
     hasStorage(req.app.get('db'), storage_size).then(dbStorage => {
       if (dbStorage)
         return res
@@ -69,6 +74,11 @@ storageRouter
       return res
         .status(400)
         .json({ error: `Missing 'storage_size' in request body` });
+
+    if (isNaN(storage_size))
+      return res
+        .status(400)
+        .json({ error: `'${storage_size}' is not a number` });
 
     hasStorage(req.app.get('db'), storage_size).then(dbStorage => {
       if (dbStorage)

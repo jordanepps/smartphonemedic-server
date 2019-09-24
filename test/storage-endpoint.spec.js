@@ -68,6 +68,16 @@ describe.only('device storage endpoint', () => {
           .expect(400, { error: `'${testSize.storage_size}' already exists` });
       });
 
+      it(`responds 400 when 'storage_size' isn't a number`, () => {
+        const size = { id: 4, storage_size: 'fish' };
+
+        return supertest(app)
+          .post(url)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(size)
+          .expect(400, { error: `'${size.storage_size}' is not a number` });
+      });
+
       it(`responds 201 when 'storage_size' is added`, () => {
         const validSize = { id: 4, storage_size: '128' };
 
@@ -131,6 +141,16 @@ describe.only('device storage endpoint', () => {
           .expect(400, { error: `'${patchTest.storage_size}' already taken` });
       });
 
+      it(`responds 400 when 'storage_size' isn't a number`, () => {
+        const size = { id: 4, storage_size: 'fish' };
+
+        return supertest(app)
+          .patch(`${url}/${testSize.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(size)
+          .expect(400, { error: `'${size.storage_size}' is not a number` });
+      });
+
       it(`responds with 204 when 'storage_size' is updated`, () => {
         const patchTest = { storage_size: '128' };
         return supertest(app)
@@ -141,7 +161,7 @@ describe.only('device storage endpoint', () => {
       });
     });
 
-    context.only('DELETE', () => {
+    context('DELETE', () => {
       it('responds 401 when unauthorized user makes delete request', () => {
         return supertest(app)
           .delete(`${url}/${testSize.id}`)
