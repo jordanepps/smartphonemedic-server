@@ -28,7 +28,11 @@ function checkIfStorageExists(req, res, next) {
 storageRouter
   .route('/')
   .all(requireAuth, jsonBodyParser)
-  .get()
+  .get((req, res, next) => {
+    getAll(req.app.get('db'))
+      .then(size => res.json(size.map(serialize)))
+      .catch(next);
+  })
   .post();
 
 storageRouter
