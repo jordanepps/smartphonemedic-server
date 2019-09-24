@@ -106,7 +106,7 @@ describe.only('device storage endpoint', () => {
       });
     });
 
-    context.only('PATCH', () => {
+    context('PATCH', () => {
       it('responds 401 when unauthorized user makes patch request', () => {
         const patchTest = { storage_size: '128' };
         return supertest(app)
@@ -137,6 +137,28 @@ describe.only('device storage endpoint', () => {
           .patch(`${url}/${testSize.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(patchTest)
+          .expect(204);
+      });
+    });
+
+    context.only('DELETE', () => {
+      it('responds 401 when unauthorized user makes delete request', () => {
+        return supertest(app)
+          .delete(`${url}/${testSize.id}`)
+          .expect(401);
+      });
+
+      it(`responds 404 when no size exists to delete`, () => {
+        return supertest(app)
+          .delete(`${url}/99999`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(404, { error: 'Storage size does not exist' });
+      });
+
+      it('responds with 204 and removes size', () => {
+        return supertest(app)
+          .delete(`${url}/${testSize.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(204);
       });
     });

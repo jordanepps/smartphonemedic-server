@@ -81,6 +81,10 @@ storageRouter
       .then(numRowsAffected => res.status(204).end())
       .catch(next);
   })
-  .delete();
+  .delete((req, res, next) => {
+    deleteStorage(req.app.get('db'), req.params.storage_id)
+      .then(() => res.status(204).end())
+      .catch(next);
+  });
 
 module.exports = storageRouter;
