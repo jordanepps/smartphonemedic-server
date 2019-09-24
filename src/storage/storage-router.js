@@ -62,7 +62,25 @@ storageRouter
   .route('/:storage_id')
   .all(requireAuth, checkIfStorageExists, jsonBodyParser)
   .get((req, res, next) => res.json(serialize(res.storage)))
-  .patch()
+  .patch((req, res, next) => {
+    const { storage_size } = req.body;
+
+    if (!storage_size)
+      return res
+        .status(400)
+        .json({ error: `Missing 'storage_size' in request body` });
+
+    hasStorage(req.app.get('db'), storage_size).then(dbStorage => {
+      if (dbStorage)
+        return res
+          .status(400)
+          .json({ error: `'${storage_size}' already taken` });
+    });
+
+    update(req.app.get('db'), req.params.storage_id, { storage_size })
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next);
+  })
   .delete();
 
 module.exports = storageRouter;

@@ -84,7 +84,7 @@ describe.only('device storage endpoint', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     beforeEach('insert sizes', () => helpers.seedStorage(db, testSizes));
 
-    context.only('GET', () => {
+    context('GET', () => {
       it('responds 401 when unauthorized user makes get request', () => {
         return supertest(app)
           .get(`${url}/${testSize.id}`)
@@ -103,6 +103,41 @@ describe.only('device storage endpoint', () => {
           .get(`${url}/${testSize.id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, testSize);
+      });
+    });
+
+    context.only('PATCH', () => {
+      it('responds 401 when unauthorized user makes patch request', () => {
+        const patchTest = { storage_size: '128' };
+        return supertest(app)
+          .patch(`${url}/${testSize.id}`)
+          .send(patchTest)
+          .expect(401);
+      });
+
+      it(`responds 400 when 'storage_size' is missing`, () => {
+        return supertest(app)
+          .patch(`${url}/${testSize.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `Missing 'storage_size' in request body` });
+      });
+
+      it(`responds with 400 when 'storage_size' is already taken`, () => {
+        const patchTest = { storage_size: '16' };
+        return supertest(app)
+          .patch(`${url}/${testSize.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(400, { error: `'${patchTest.storage_size}' already taken` });
+      });
+
+      it(`responds with 204 when 'storage_size' is updated`, () => {
+        const patchTest = { storage_size: '128' };
+        return supertest(app)
+          .patch(`${url}/${testSize.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(patchTest)
+          .expect(204);
       });
     });
   });
