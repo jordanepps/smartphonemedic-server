@@ -10,6 +10,8 @@ modelRouter
   .route('/')
   .all(requireAuth, jsonBodyParser)
   .get()
-  .post();
+  .post((req, res, next) => {
+    const { model_name } = req.body;
+  });
 
 module.exports = modelRouter;

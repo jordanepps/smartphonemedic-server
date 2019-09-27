@@ -59,6 +59,10 @@ function makeDeviceMakeArray() {
   ];
 }
 
+// function makeDeviceModelArray(){
+
+// }
+
 function makeDeviceColorArray() {
   return [
     {
